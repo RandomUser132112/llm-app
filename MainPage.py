@@ -1,11 +1,12 @@
-import streamlit as st
+import streamlit as st, PIL.Image, time, os
 from streamlit.logger import get_logger
 import google.generativeai as genai
 from pypdf import PdfReader
-import PIL.Image
+from dotenv import load_dotenv
 
+load_dotenv()
 
-api_key = "AIzaSyDE8ZCvuO9WxlC7uHYJ75nEk_1O5bVNT5Y"
+api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
 
 genai_text_model = genai.GenerativeModel("gemini-pro")
@@ -20,7 +21,7 @@ def prompt(prompt_input,colour="white"):
         st.session_state.message_history.append({"role":"user","content":f":{colour}[{prompt_input}]","isBlocked":False})
 
 
-def generate_response(prompt_input):
+def generate_response(prompt_input,role="ai"):
 
     context_history = ""
 
@@ -32,21 +33,22 @@ def generate_response(prompt_input):
         first_bracket = st.session_state.message_history[message]["content"].find("[")
         content = (st.session_state.message_history[message]["content"])[first_bracket+1:-1]
 
-        context_history += content + "\n"
-
+        context_history += content + "\n\n"
     
-    with st.chat_message("ai"):
+
+    with st.chat_message(role):
     
         try:
             with st.spinner("Generating response..."):
                 prompt_response = (genai_text_model.generate_content(context_history+prompt_input)).text
 
                 st.markdown(prompt_response)
-                st.session_state.message_history.append({"role":"ai","content":prompt_response,"isBlocked":False})
+                st.session_state.message_history.append({"role":role,"content":prompt_response,"isBlocked":False})
+                return prompt_response
                 
         except:
             st.warning("Inappropriate Prompt Detected.",icon="⚠️")
-            st.session_state.message_history.append({"role":"ai","content":"blocked","isBlocked":True})
+            st.session_state.message_history.append({"role":role,"content":"blocked","isBlocked":True})
             st.session_state.message_history[-2]["isBlocked"] = True
     
 
@@ -77,7 +79,7 @@ def run():
                 st.markdown(message["content"])
 
     sidebar = st.sidebar
-    sidebar.caption("Options")
+    sidebar.caption("Feature Panel")
 
     colours = ("White","Red","Orange","Green","Grey","Blue","Violet","Rainbow")
     colour_choice = sidebar.selectbox(label="Choose a text colour",help="Changes the colour of the text in chat",options=colours)
@@ -127,11 +129,25 @@ def run():
     sidebar.divider()
 
     random_prompt = sidebar.button(label=":blue[**Generate random prompt**]",type="secondary")
+    bot_to_bot = sidebar.button(label=":blue[**Bot-To-Bot Convo**]")
     delete_message_history = sidebar.button(label="**Delete Message History**",type="primary")
 
     if delete_message_history:
         
         clear_state()
+
+
+    if bot_to_bot:
+
+        st.session_state.message_history.clear()
+
+        second = "greet an ai bot"
+
+        while True:
+
+            first = generate_response(second, role="🔴")
+            time.sleep(1)
+            second = generate_response(first, role="🔵")
   
     
     prompt_input = st.chat_input("Enter prompt here.")
