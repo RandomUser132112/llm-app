@@ -1,5 +1,4 @@
 streamlit
 google.generativeai
 pypdf
-time
 python-dotenv
