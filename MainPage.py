@@ -44,7 +44,7 @@ def generate_response(prompt_input,role="ai"):
     
     # Use an "AI" icon to display the generated resposne
     with st.chat_message(role):
-        # Handle any exceptions related to disallowed prompt
+        # Handle any exceptions related to disallowed prompts
         try:
             # While the text is being generated, use a spinner status
             with st.spinner("Generating response..."):
@@ -57,7 +57,7 @@ def generate_response(prompt_input,role="ai"):
         # Catch any exceptions    
         except:
             # Throw a warning to the user
-            st.warning("Inappropriate Prompt Detected.",icon="⚠️")
+            st.warning("An error has occured.",icon="⚠️")
             # Store the warning to the message history and block the prompt & the response from being considered in the context history
             st.session_state.message_history.append({"role":role,"content":"blocked","isBlocked":True})
             st.session_state.message_history[-2]["isBlocked"] = True
@@ -88,7 +88,7 @@ def run():
                 st.image(message["file"])
             # Else if the message is blocked, throw a warning
             elif message["content"] == "blocked":
-                st.warning("Inappropriate Prompt Detected.",icon="⚠️")
+                st.warning("An error has occured.",icon="⚠️")
             # Else, just display the content of the message
             else:
                 st.markdown(message["content"])
