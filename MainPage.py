@@ -57,7 +57,7 @@ def generate_response(prompt_input,role="ai"):
         # Catch any exceptions    
         except:
             # Throw a warning to the user
-            st.warning("An error has occured.",icon="⚠️")
+            st.warning("An error has occurred.",icon="⚠️")
             # Store the warning to the message history and block the prompt & the response from being considered in the context history
             st.session_state.message_history.append({"role":role,"content":"blocked","isBlocked":True})
             st.session_state.message_history[-2]["isBlocked"] = True
@@ -88,7 +88,7 @@ def run():
                 st.image(message["file"])
             # Else if the message is blocked, throw a warning
             elif message["content"] == "blocked":
-                st.warning("An error has occured.",icon="⚠️")
+                st.warning("An error has occurred.",icon="⚠️")
             # Else, just display the content of the message
             else:
                 st.markdown(message["content"])
